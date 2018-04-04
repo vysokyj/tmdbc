@@ -33,6 +33,9 @@ func getYear(date string) string {
 
 func main() {
 	conf = LoadConfiguration()
+	fmt.Println("The Movie Database Client")
+	fmt.Println("Copyright (c) Jiri Vysoky, 2018")
+	fmt.Printf("API Key: %s\n", conf.APIKey)
 	fmt.Printf("Language: %s\n", conf.Language)
 
 	if len(os.Args) < 2 {
