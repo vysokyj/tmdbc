@@ -15,7 +15,7 @@ func check(err error) {
 	}
 }
 
-var conf *Configuration
+var conf *configuration
 
 // TMDb access The Movie Database API
 var TMDb *tmdb.TMDb
@@ -31,22 +31,25 @@ func getYear(date string) string {
 	return parts[0]
 }
 
-func main() {
-	conf = LoadConfiguration()
-	fmt.Println("The Movie Database Client")
-	fmt.Println("Copyright (c) Jiri Vysoky, 2018")
-	fmt.Printf("API Key: %s\n", conf.APIKey)
-	fmt.Printf("Language: %s\n", conf.Language)
-
+func checkArgs() {
 	if len(os.Args) < 2 {
 		fmt.Println("Missing MKV movie path!")
 		os.Exit(1)
 	}
+}
+
+func main() {
+	checkArgs()
+	conf = loadConfiguration()
+	fmt.Println("The Movie Database Client")
+	fmt.Println("Copyright \u00A9 Jiří Vysoký, 2018")
+	fmt.Printf("API Key: %s\n", conf.APIKey)
+	fmt.Printf("Language: %s\n", conf.Language)
 
 	TMDb = tmdb.Init(conf.APIKey)
 
 	for i := 1; i < len(os.Args); i++ {
-		job := Job{File: os.Args[i]}
-		job.SearchByFilename()
+		job := job{File: os.Args[i]}
+		job.searchByFilename()
 	}
 }

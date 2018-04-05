@@ -5,10 +5,9 @@ import (
 )
 
 //ExistFile checks if file exists
-func ExistFile(file string) bool {
+func existFile(file string) bool {
 	if _, err := os.Stat(file); os.IsNotExist(err) {
 		return false
-	} else {
-		return true
 	}
+	return true
 }

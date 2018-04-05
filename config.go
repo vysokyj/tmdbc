@@ -7,20 +7,18 @@ import (
 	"path"
 )
 
-// Configuration stores persistent application settings
-type Configuration struct {
+type configuration struct {
 	APIKey   string `json:"apiKey"`
 	Language string `json:"language"`
 }
 
-// LoadConfiguration configuration from ~/.tmdbc file
-func LoadConfiguration() *Configuration {
-	var c *Configuration
+func loadConfiguration() *configuration {
+	var c *configuration
 	usr, err1 := user.Current()
 	check(err1)
 	file := path.Join(usr.HomeDir, ".tmdbc")
-	if !ExistFile(file) {
-		c = new(Configuration)
+	if !existFile(file) {
+		c = new(configuration)
 	}
 	dat, err3 := ioutil.ReadFile(file)
 	check(err3)
@@ -29,7 +27,6 @@ func LoadConfiguration() *Configuration {
 	return c
 }
 
-// IsSet check if configuration is set
-func (c Configuration) IsSet() bool {
+func (c configuration) isSet() bool {
 	return true
 }
