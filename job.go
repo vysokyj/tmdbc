@@ -42,22 +42,28 @@ func newJob(file string) *job {
 }
 
 func (j *job) downloadPoster() {
-	images, err := tmdbClient.GetMovieImages(j.Movie.ID, tmdbOptions)
+	var images *tmdb.MovieImages
+	var err error
+	images, err = tmdbClient.GetMovieImages(j.Movie.ID, tmdbOptions)
 	check(err)
-	//for index, poster := range images.Posters {
-	//	fmt.Printf("%d: %s [%dx%d]\n", index+1, poster.FilePath, poster.Width, poster.Height)
-	//}
 	if len(images.Posters) < 1 {
-		fmt.Println("No covers found!")
-		os.Exit(1)
+		fmt.Println("No covers found - trying default language!")
+		ops := make(map[string]string)
+		for key, value := range tmdbOptions {
+			ops[key] = value
+		}
+		ops["language"] = "en"
+		images, err = tmdbClient.GetMovieImages(j.Movie.ID, ops)
+		check(err)
+		if len(images.Posters) < 1 {
+			fmt.Println("No covers found!")
+			os.Exit(1)
+		}
 	}
 	poster := images.Posters[0]
-	//url := "http://image.tmdb.org/t/p/w600" + poster.FilePath
 	url := "http://image.tmdb.org/t/p/original" + poster.FilePath
 	file := path.Join(os.TempDir(), "original"+path.Ext(poster.FilePath))
 	out, err := os.Create(file)
-	//fmt.Printf("%s\n", poster.FilePath)
-	//fmt.Printf("%s\n", poster.Iso639_1)
 	check(err)
 	defer out.Close()
 	resp, err := http.Get(url)
