@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/ryanbradynd05/go-tmdb"
 )
@@ -18,11 +17,6 @@ func check(err error) {
 var config *configuration
 var tmdbOptions map[string]string
 var tmdbClient *tmdb.TMDb
-
-func getYear(date string) string {
-	parts := strings.Split(date, "-")
-	return parts[0]
-}
 
 func checkArgs() {
 	if len(os.Args) < 2 {

@@ -191,56 +191,65 @@ func (j *job) processMovie() {
 	j.addNewMetadata()
 }
 
+func (j *job) getMovie(movieShort *tmdb.MovieShort) {
+	movie, err := tmdbClient.GetMovieInfo(movieShort.ID, tmdbOptions)
+	check(err)
+	j.Movie = movie
+	j.processMovie()
+}
+
 // SearchMovie search job movie by given string
-func (j *job) searchMovie(name string) {
+func (j *job) searchMovie(name string, year string) {
+	var movieShort tmdb.MovieShort
 	j.SearchString = name
-	fmt.Printf("File: %s - searching \"%s\"\n", j.File, name)
+	fmt.Printf("File: %s\n", j.File)
+	fmt.Printf("Search: %s (%s)\n", name, year)
 	movieSearchResults, err := tmdbClient.SearchMovie(name, tmdbOptions)
 	reader := bufio.NewReader(os.Stdin)
 	check(err)
-	if movieSearchResults.TotalResults > 1 {
+	if movieSearchResults.TotalResults == 1 && (year == "" || year == getYear(movieSearchResults.Results[0].ReleaseDate)) {
+		movieShort := movieSearchResults.Results[0]
+		j.getMovie(&movieShort)
+	} else {
 		fmt.Println("Please select index or action:")
-	}
-	for index, movieShort := range movieSearchResults.Results {
-		fmt.Printf("%d: %s (%s)\n", index+1, movieShort.Title, getYear(movieShort.ReleaseDate))
-	}
-	fmt.Println("s: Search")
-	fmt.Println("q: Quit")
-	a1, _, _ := reader.ReadLine()
-	s1 := string(a1)
+		for index, movieShort := range movieSearchResults.Results {
+			fmt.Printf("%d: %s (%s)\n", index+1, movieShort.Title, getYear(movieShort.ReleaseDate))
+		}
+		fmt.Println("s: Search")
+		fmt.Println("q: Quit")
+		a1, _, _ := reader.ReadLine()
+		s1 := string(a1)
 
-	switch s1 {
-	case "s":
-		fmt.Print("Search: ")
-		a2, _, _ := reader.ReadLine()
-		j.searchMovie(string(a2[:]))
-		return
-	case "q":
-		os.Exit(0)
-	}
+		switch s1 {
+		case "s":
+			fmt.Print("Search: ")
+			a2, _, _ := reader.ReadLine()
+			newName, newYear := getMovieNameAndYear(string(a2[:]))
+			j.searchMovie(newName, newYear)
+			return
+		case "q":
+			os.Exit(0)
+		}
 
-	i, err := strconv.Atoi(s1)
-	if err != nil || i < 0 || i > len(movieSearchResults.Results) {
-		fmt.Println("This is not valid index!")
-		j.searchMovie(name)
+		i, err := strconv.Atoi(s1)
+		if err != nil || i < 0 || i > len(movieSearchResults.Results) {
+			fmt.Println("This is not valid index!")
+			j.searchMovie(name, year)
+		}
+		movieShort = movieSearchResults.Results[i-1]
+		j.getMovie(&movieShort)
 	}
-	movieShort := movieSearchResults.Results[i-1]
-	movie, err2 := tmdbClient.GetMovieInfo(movieShort.ID, tmdbOptions)
-	check(err2)
-	j.Movie = movie
-
-	//fmt.Printf("%+v\n", j)
-	j.processMovie()
 }
 
 // SearchByFilename search movie by filename
 func (j *job) searchByFilename() {
 	j.Filename = path.Base(j.File)
 	j.Extension = path.Ext(j.Filename)
-	name := j.Filename[0 : len(j.Filename)-len(j.Extension)]
+	fullName := j.Filename[0 : len(j.Filename)-len(j.Extension)]
 	if j.Extension != ".mkv" {
 		fmt.Printf("Unsupported movie extension %s\n", j.Extension)
 		os.Exit(1)
 	}
-	j.searchMovie(name)
+	name, year := getMovieNameAndYear(fullName)
+	j.searchMovie(name, year)
 }
