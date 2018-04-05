@@ -28,9 +28,16 @@ go install
 
 Call utilty with movie with one or move movie files arguments.
 
-Example:
+### Examples
+
+#### Example 1:
 
 ```bash
 tmdbc "Alien (1979).mkv" "Alice in Wonderland.mkv"
+```
+
+#### Example 2:
+
+```bash
 tmdbc *.mkv
 ```
