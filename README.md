@@ -8,12 +8,14 @@ The tool searches in the database automaticaly by filename. The filename can con
 
 Supported movie name example: Alien (1979).mkv
 
-## Compilation Prerequsites
-
-*  Install mkvtoolnix
-*  Install go
-
 ## Compilation and Installation
+
+### Prerequsites
+
+*  Install [mkvtoolnix](https://mkvtoolnix.download/)
+*  Install [GO](https://golang.org/)
+
+### Commands
 
 ```bash
 go get -u github.com/disintegration/imaging
@@ -22,7 +24,11 @@ go get -u github.com/vysokyj/tmdbc
 go install
 ```
 
-## Example Usage
+## Usage
+
+Call utilty with movie with one or move movie files arguments.
+
+Example:
 
 ```bash
 tmdbc "Alien (1979).mkv" "Alice in Wonderland.mkv"
