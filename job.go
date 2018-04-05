@@ -71,7 +71,7 @@ func (j *job) downloadPoster() {
 	defer resp.Body.Close()
 	c, err := io.Copy(out, resp.Body)
 	check(err)
-	fmt.Printf("Cover image: %s %dx%d px - %d bytes\n", file, poster.Width, poster.Height, c)
+	fmt.Printf("Poster: %d px x %d px, %d bytes\n", poster.Width, poster.Height, c)
 	j.Poster = &poster
 	j.PosterFile = file
 }
@@ -143,48 +143,37 @@ func (j *job) addNewMetadata() {
 
 	cmd := exec.Command("mkvpropedit", args...)
 
-	fmt.Print("mkvpropedit")
-	for _, arg := range args {
-		fmt.Print(" ")
-		if strings.Contains(arg, " ") {
-			fmt.Printf("\"%s\"", arg)
-		} else {
-			fmt.Print(arg)
-		}
+	/*
+		fmt.Print("mkvpropedit")
+		for _, arg := range args {
+			fmt.Print(" ")
+			if strings.Contains(arg, " ") {
+				fmt.Printf("\"%s\"", arg)
+			} else {
+				fmt.Print(arg)
+			}
 
-	}
-	fmt.Print("\n")
+		}
+		fmt.Print("\n")
+	*/
 
 	var buffer bytes.Buffer
 	cmd.Stdout = &buffer
 	cmd.Stderr = &buffer
 	err := cmd.Run()
 	fmt.Println(buffer.String())
-	// check(err)
-	if err != nil {
-		cmd := exec.Command("mkvpropedit",
-			j.File,
-			"--edit", "info",
-			"--set", "title="+j.Movie.Title,
-			"--add-attachment", j.CoverFile,
-			"--add-attachment", j.CoverSmallFile,
-		)
-		var buffer bytes.Buffer
-		cmd.Stdout = &buffer
-		cmd.Stderr = &buffer
-		err := cmd.Run()
-		fmt.Println(buffer.String())
-		check(err)
-	}
-
+	check(err)
 }
 
 func (j *job) processMovie() {
-	fmt.Printf("Processing file: %s\n", j.File)
-	fmt.Printf("ID: %d\n", j.Movie.ID)
-	fmt.Printf("Title: %s\n", j.Movie.Title)
-	fmt.Printf("Original title: %s\n", j.Movie.OriginalTitle)
-	fmt.Printf("Release date: %s\n", j.Movie.ReleaseDate)
+	/*
+		fmt.Printf("Processing file: %s\n", j.File)
+		fmt.Printf("ID: %d\n", j.Movie.ID)
+		fmt.Printf("Title: %s\n", j.Movie.Title)
+		fmt.Printf("Original title: %s\n", j.Movie.OriginalTitle)
+		fmt.Printf("Release date: %s\n", j.Movie.ReleaseDate)
+	*/
+	fmt.Printf("Found:  %s (%s)\n", j.Movie.Title, getYear(j.Movie.ReleaseDate))
 	j.downloadPoster()
 	j.prepareCovers()
 	j.loadOldMetadata()
@@ -229,12 +218,15 @@ func (j *job) promtSelectAction(name string, year string, results *tmdb.MovieSea
 	j.getMovie(&movieShort)
 }
 
-// SearchMovie search job movie by given string
 func (j *job) searchMovie(name string, year string) {
 	var movieShort tmdb.MovieShort
 	j.SearchString = name
-	fmt.Printf("File: %s\n", j.File)
-	fmt.Printf("Search: %s (%s)\n", name, year)
+	fmt.Printf("File:   %s\n", path.Base(j.File))
+	if year == "" {
+		fmt.Printf("Search: %s (????)\n", name)
+	} else {
+		fmt.Printf("Search: %s (%s)\n", name, year)
+	}
 	results, err := tmdbClient.SearchMovie(name, tmdbOptions)
 	check(err)
 	if results.TotalResults == 1 && (year == "" || year == getYear(results.Results[0].ReleaseDate)) {

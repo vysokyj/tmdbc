@@ -30,7 +30,7 @@ func printHeader() {
 	fmt.Println("Copyright \u00A9 Jiří Vysoký, 2018")
 	fmt.Println("Licese: GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007")
 	fmt.Printf("API Key: %s\n", config.APIKey)
-	fmt.Printf("Language: %s\n", config.Language)
+	fmt.Printf("Language: %s\n\n", config.Language)
 }
 
 func main() {
