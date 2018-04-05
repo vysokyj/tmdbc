@@ -13,7 +13,7 @@ Supported movie name example: Alien (1979).mkv
 *  Install mkvtoolnix
 *  Install go
 
-## Compilling and Installation
+## Compilation and Installation
 
 ```bash
 go get -u github.com/disintegration/imaging
