@@ -26,7 +26,7 @@ go install
 
 ## Usage
 
-Call utilty with movie with one or move movie files arguments.
+Call utilty with one or move movie file path arguments.
 
 ### Examples
 
