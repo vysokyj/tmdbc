@@ -1,6 +1,6 @@
 # tmdbc - The Movie Database Client
 
-Command line utility for downloading metadata and posters from The Movie Database and inserting into movie files.
+Command line utility for downloading metadata and posters from [The Movie Database](https://www.themoviedb.org) and inserting into movie files.
 
 Supported video containsers: MKV
 
