@@ -198,46 +198,63 @@ func (j *job) getMovie(movieShort *tmdb.MovieShort) {
 	j.processMovie()
 }
 
+func (j *job) promtSelectAction(name string, year string, results *tmdb.MovieSearchResults) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Println("Please select index or action:")
+	for index, movieShort := range results.Results {
+		fmt.Printf("%d: %s (%s)\n", index+1, movieShort.Title, getYear(movieShort.ReleaseDate))
+	}
+	fmt.Println("s: Search")
+	fmt.Println("q: Quit")
+	a1, _, _ := reader.ReadLine()
+	s1 := string(a1)
+
+	switch s1 {
+	case "s":
+		fmt.Print("Search: ")
+		a2, _, _ := reader.ReadLine()
+		newName, newYear := getMovieNameAndYear(string(a2[:]))
+		j.searchMovie(newName, newYear)
+		return
+	case "q":
+		os.Exit(0)
+	}
+
+	i, err := strconv.Atoi(s1)
+	if err != nil || i < 0 || i > len(results.Results) {
+		fmt.Println("This is not valid index!")
+		j.searchMovie(name, year)
+	}
+	movieShort := results.Results[i-1]
+	j.getMovie(&movieShort)
+}
+
 // SearchMovie search job movie by given string
 func (j *job) searchMovie(name string, year string) {
 	var movieShort tmdb.MovieShort
 	j.SearchString = name
 	fmt.Printf("File: %s\n", j.File)
 	fmt.Printf("Search: %s (%s)\n", name, year)
-	movieSearchResults, err := tmdbClient.SearchMovie(name, tmdbOptions)
-	reader := bufio.NewReader(os.Stdin)
+	results, err := tmdbClient.SearchMovie(name, tmdbOptions)
 	check(err)
-	if movieSearchResults.TotalResults == 1 && (year == "" || year == getYear(movieSearchResults.Results[0].ReleaseDate)) {
-		movieShort := movieSearchResults.Results[0]
+	if results.TotalResults == 1 && (year == "" || year == getYear(results.Results[0].ReleaseDate)) {
+		movieShort = results.Results[0]
 		j.getMovie(&movieShort)
+	} else if year != "" {
+		count := 0
+		for _, m := range results.Results {
+			if year == getYear(m.ReleaseDate) {
+				count++
+				movieShort = m
+			}
+		}
+		if count == 1 {
+			j.getMovie(&movieShort)
+		} else {
+			j.promtSelectAction(name, year, results)
+		}
 	} else {
-		fmt.Println("Please select index or action:")
-		for index, movieShort := range movieSearchResults.Results {
-			fmt.Printf("%d: %s (%s)\n", index+1, movieShort.Title, getYear(movieShort.ReleaseDate))
-		}
-		fmt.Println("s: Search")
-		fmt.Println("q: Quit")
-		a1, _, _ := reader.ReadLine()
-		s1 := string(a1)
-
-		switch s1 {
-		case "s":
-			fmt.Print("Search: ")
-			a2, _, _ := reader.ReadLine()
-			newName, newYear := getMovieNameAndYear(string(a2[:]))
-			j.searchMovie(newName, newYear)
-			return
-		case "q":
-			os.Exit(0)
-		}
-
-		i, err := strconv.Atoi(s1)
-		if err != nil || i < 0 || i > len(movieSearchResults.Results) {
-			fmt.Println("This is not valid index!")
-			j.searchMovie(name, year)
-		}
-		movieShort = movieSearchResults.Results[i-1]
-		j.getMovie(&movieShort)
+		j.promtSelectAction(name, year, results)
 	}
 }
 
