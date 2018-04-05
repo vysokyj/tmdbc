@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os/user"
-	"path"
+	"path/filepath"
 )
 
 type configuration struct {
@@ -16,7 +16,7 @@ func loadConfiguration() *configuration {
 	var c *configuration
 	usr, err1 := user.Current()
 	check(err1)
-	file := path.Join(usr.HomeDir, ".tmdbc")
+	file := filepath.Join(usr.HomeDir, ".tmdbc")
 	if !existFile(file) {
 		c = new(configuration)
 	}

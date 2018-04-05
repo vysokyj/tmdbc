@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -62,7 +62,7 @@ func (j *job) downloadPoster() {
 	}
 	poster := images.Posters[0]
 	url := "http://image.tmdb.org/t/p/original" + poster.FilePath
-	file := path.Join(os.TempDir(), "original"+path.Ext(poster.FilePath))
+	file := filepath.Join(os.TempDir(), "original"+filepath.Ext(poster.FilePath))
 	out, err := os.Create(file)
 	check(err)
 	defer out.Close()
@@ -77,9 +77,9 @@ func (j *job) downloadPoster() {
 }
 
 func (j *job) prepareCovers() {
-	ext := path.Ext(j.Poster.FilePath)
-	coverFile := path.Join(os.TempDir(), "cover"+ext)
-	coverSmallFile := path.Join(os.TempDir(), "cover_small"+ext)
+	ext := filepath.Ext(j.Poster.FilePath)
+	coverFile := filepath.Join(os.TempDir(), "cover"+ext)
+	coverSmallFile := filepath.Join(os.TempDir(), "cover_small"+ext)
 	originalWidth := j.Poster.Width
 	originalHeight := j.Poster.Height
 	coverWidht := mkvCoverLimit
@@ -221,7 +221,7 @@ func (j *job) promtSelectAction(name string, year string, results *tmdb.MovieSea
 func (j *job) searchMovie(name string, year string) {
 	var movieShort tmdb.MovieShort
 	j.SearchString = name
-	fmt.Printf("File:   %s\n", path.Base(j.File))
+	fmt.Printf("File:   %s\n", filepath.Base(j.File))
 	if year == "" {
 		fmt.Printf("Search: %s (????)\n", name)
 	} else {
@@ -252,8 +252,8 @@ func (j *job) searchMovie(name string, year string) {
 
 // SearchByFilename search movie by filename
 func (j *job) searchByFilename() {
-	j.Filename = path.Base(j.File)
-	j.Extension = path.Ext(j.Filename)
+	j.Filename = filepath.Base(j.File)
+	j.Extension = filepath.Ext(j.Filename)
 	fullName := j.Filename[0 : len(j.Filename)-len(j.Extension)]
 	if j.Extension != ".mkv" {
 		fmt.Printf("Unsupported movie extension %s\n", j.Extension)
