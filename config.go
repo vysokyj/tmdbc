@@ -5,6 +5,9 @@ import (
 	"io/ioutil"
 	"os/user"
 	"path/filepath"
+	"fmt"
+	"bufio"
+	"os"
 )
 
 type configuration struct {
@@ -12,21 +15,55 @@ type configuration struct {
 	Language string `json:"language"`
 }
 
+func getConfigurationFile() string {
+	usr, err := user.Current()
+	check(err)
+	return filepath.Join(usr.HomeDir, ".tmdbc")
+}
+
 func loadConfiguration() *configuration {
 	var c *configuration
-	usr, err1 := user.Current()
-	check(err1)
-	file := filepath.Join(usr.HomeDir, ".tmdbc")
+	file := getConfigurationFile()
 	if !existFile(file) {
 		c = new(configuration)
+		c.askApiKey()
+		c.askLanguage()
+		c.save(file)
+	} else {
+		dat, err := ioutil.ReadFile(file)
+		check(err)
+		err = json.Unmarshal(dat, &c)
+		check(err)
 	}
-	dat, err3 := ioutil.ReadFile(file)
-	check(err3)
-	err4 := json.Unmarshal(dat, &c)
-	check(err4)
 	return c
 }
 
-func (c configuration) isSet() bool {
-	return true
+func (c *configuration) askApiKey() {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("API key: ")
+	bytes, _, err := reader.ReadLine()
+	check(err)
+	//TODO: Check with regular expression
+	s := string(bytes)
+	fmt.Println(s)
+	c.APIKey = s
+}
+
+func (c *configuration) askLanguage() {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Language: ")
+	bytes, _, err := reader.ReadLine()
+	check(err)
+	//TODO: Check with regular expression
+	s := string(bytes)
+	fmt.Println(s)
+	c.Language = s
+}
+
+func (c *configuration) save(file string) {
+	fmt.Println(c)
+	bytes, err := json.Marshal(c)
+	check(err)
+	err = ioutil.WriteFile(file, bytes, 0644)
+	check(err)
 }

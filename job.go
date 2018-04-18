@@ -187,7 +187,7 @@ func (j *job) getMovie(movieShort *tmdb.MovieShort) {
 	j.processMovie()
 }
 
-func (j *job) promtSelectAction(name string, year string, results *tmdb.MovieSearchResults) {
+func (j *job) promptSelectAction(name string, year string, results *tmdb.MovieSearchResults) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Please select index or action:")
 	for index, movieShort := range results.Results {
@@ -243,10 +243,10 @@ func (j *job) searchMovie(name string, year string) {
 		if count == 1 {
 			j.getMovie(&movieShort)
 		} else {
-			j.promtSelectAction(name, year, results)
+			j.promptSelectAction(name, year, results)
 		}
 	} else {
-		j.promtSelectAction(name, year, results)
+		j.promptSelectAction(name, year, results)
 	}
 }
 

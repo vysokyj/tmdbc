@@ -34,8 +34,9 @@ func printHeader() {
 }
 
 func main() {
-	checkArgs()
+
 	config = loadConfiguration()
+	checkArgs()
 	printHeader()
 
 	tmdbOptions = make(map[string]string)
