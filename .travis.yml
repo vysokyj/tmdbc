@@ -1,5 +1,9 @@
 language: go
 
+install:
+  - go get github.com/disintegration/imaging
+  - go get github.com/ryanbradynd05/go-tmdb
+
 go:
   - 1.x
   - 1.11.x
