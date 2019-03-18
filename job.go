@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/disintegration/imaging"
-	tmdb "github.com/ryanbradynd05/go-tmdb"
+	"github.com/ryanbradynd05/go-tmdb"
 )
 
 const mkvCoverLimit = 600
@@ -65,10 +65,10 @@ func (j *job) downloadPoster() {
 	file := filepath.Join(os.TempDir(), "original"+filepath.Ext(poster.FilePath))
 	out, err := os.Create(file)
 	check(err)
-	defer out.Close()
+	defer check(out.Close())
 	resp, err := http.Get(url)
 	check(err)
-	defer resp.Body.Close()
+	defer check(resp.Body.Close())
 	c, err := io.Copy(out, resp.Body)
 	check(err)
 	fmt.Printf("Poster: %d px x %d px, %d bytes\n", poster.Width, poster.Height, c)
@@ -89,9 +89,9 @@ func (j *job) prepareCovers() {
 	originalImage, err := imaging.Open(j.PosterFile)
 	check(err)
 	coverImage := imaging.Fit(originalImage, coverWidht, coverHeight, imaging.Lanczos)
-	imaging.Save(coverImage, coverFile)
+	check(imaging.Save(coverImage, coverFile))
 	coverSmallImage := imaging.Fit(originalImage, coverSmallWidht, coverSmallHeight, imaging.Lanczos)
-	imaging.Save(coverSmallImage, coverSmallFile)
+	check(imaging.Save(coverSmallImage, coverSmallFile))
 	j.CoverFile = coverFile
 	j.CoverSmallFile = coverSmallFile
 }
