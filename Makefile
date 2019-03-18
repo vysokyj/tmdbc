@@ -1,4 +1,8 @@
+.PHONY: all
+
 all:
+	go get -u github.com/disintegration/imaging
+	go get -u github.com/ryanbradynd05/go-tmdb
 	mkdir -p build/linux_386
 	GOOS=linux GOARCH=386 go build -o build/linux_386/tmdbc ./
 	mkdir -p build/linux_amd64
