@@ -1,5 +1,7 @@
 # tmdbc - The Movie Database Client
 
+[![Build Status](https://secure.travis-ci.org/vysokyj/tmdbc.svg?branch=master)](http://travis-ci.org/vysokyj/tmdbc)
+
 Command line utility for downloading metadata and posters from [The Movie Database](https://www.themoviedb.org) and inserting into movie files.
 
 Supported video containsers: MKV
