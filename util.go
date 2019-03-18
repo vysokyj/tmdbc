@@ -23,3 +23,11 @@ func getMovieNameAndYear(s string) (name string, year string) {
 
 	return s, ""
 }
+
+func fixSearchText(s string) string {
+	re1 := regexp.MustCompile(`(\.|_|-)`)
+	s = re1.ReplaceAllString(s, " ")
+	re2 := regexp.MustCompile(`(\S)([A-Z])`)
+	s = re2.ReplaceAllString(s, "$1 $2")
+	return s
+}

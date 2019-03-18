@@ -261,6 +261,7 @@ func (j *job) searchMovie(name string, year string) {
 	}
 }
 
+
 // SearchByFilename search movie by filename
 func (j *job) searchByFilename() {
 	j.Filename = filepath.Base(j.File)
@@ -270,6 +271,6 @@ func (j *job) searchByFilename() {
 		fmt.Printf("Unsupported movie extension %s\n", j.Extension)
 		os.Exit(1)
 	}
-	name, year := getMovieNameAndYear(fullName)
+	name, year := getMovieNameAndYear(fixSearchText(fullName))
 	j.searchMovie(name, year)
 }
