@@ -47,7 +47,7 @@ func main() {
 	tmdbClient = tmdb.Init(tmdbConfig)
 
 	for i := 1; i < len(os.Args); i++ {
-		job := job{File: os.Args[i]}
+		job := newJob(os.Args[i])
 		job.searchByFilename()
 	}
 }

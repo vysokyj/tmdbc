@@ -41,39 +41,50 @@ func newJob(file string) *job {
 	return j
 }
 
-func (j *job) downloadPoster() {
+func (j *job) getPosterInDefaultLanguage() tmdb.MovieImage {
+	var images *tmdb.MovieImages
+	var err error
+	ops := make(map[string]string)
+	for key, value := range tmdbOptions {
+		ops[key] = value
+	}
+	ops["language"] = "en"
+	images, err = tmdbClient.GetMovieImages(j.Movie.ID, ops)
+	check(err)
+	if len(images.Posters) < 1 {
+		fmt.Println("No covers found!")
+		os.Exit(1)
+	}
+	return images.Posters[0]
+}
+
+func (j *job) getPoster() tmdb.MovieImage {
 	var images *tmdb.MovieImages
 	var err error
 	images, err = tmdbClient.GetMovieImages(j.Movie.ID, tmdbOptions)
 	check(err)
 	if len(images.Posters) < 1 {
 		fmt.Println("No covers found - trying default language!")
-		ops := make(map[string]string)
-		for key, value := range tmdbOptions {
-			ops[key] = value
-		}
-		ops["language"] = "en"
-		images, err = tmdbClient.GetMovieImages(j.Movie.ID, ops)
-		check(err)
-		if len(images.Posters) < 1 {
-			fmt.Println("No covers found!")
-			os.Exit(1)
-		}
+		return j.getPosterInDefaultLanguage()
 	}
-	poster := images.Posters[0]
+	return images.Posters[0]
+}
+
+func (j *job) downloadPoster() {
+	poster := j.getPoster()
 	url := "http://image.tmdb.org/t/p/original" + poster.FilePath
 	file := filepath.Join(os.TempDir(), "original"+filepath.Ext(poster.FilePath))
 	out, err := os.Create(file)
 	check(err)
-	defer check(out.Close())
 	resp, err := http.Get(url)
 	check(err)
-	defer check(resp.Body.Close())
 	c, err := io.Copy(out, resp.Body)
 	check(err)
 	fmt.Printf("Poster: %d px x %d px, %d bytes\n", poster.Width, poster.Height, c)
 	j.Poster = &poster
 	j.PosterFile = file
+	check(resp.Body.Close())
+	check(out.Close())
 }
 
 func (j *job) prepareCovers() {
@@ -82,15 +93,15 @@ func (j *job) prepareCovers() {
 	coverSmallFile := filepath.Join(os.TempDir(), "cover_small"+ext)
 	originalWidth := j.Poster.Width
 	originalHeight := j.Poster.Height
-	coverWidht := mkvCoverLimit
-	coverHeight := originalHeight * coverWidht / originalWidth
-	coverSmallWidht := mkvCoverSmallLimit
-	coverSmallHeight := originalHeight * coverSmallWidht / originalWidth
+	coverWidth := mkvCoverLimit
+	coverHeight := originalHeight * coverWidth / originalWidth
+	coverSmallWidth := mkvCoverSmallLimit
+	coverSmallHeight := originalHeight * coverSmallWidth / originalWidth
 	originalImage, err := imaging.Open(j.PosterFile)
 	check(err)
-	coverImage := imaging.Fit(originalImage, coverWidht, coverHeight, imaging.Lanczos)
+	coverImage := imaging.Fit(originalImage, coverWidth, coverHeight, imaging.Lanczos)
 	check(imaging.Save(coverImage, coverFile))
-	coverSmallImage := imaging.Fit(originalImage, coverSmallWidht, coverSmallHeight, imaging.Lanczos)
+	coverSmallImage := imaging.Fit(originalImage, coverSmallWidth, coverSmallHeight, imaging.Lanczos)
 	check(imaging.Save(coverSmallImage, coverSmallFile))
 	j.CoverFile = coverFile
 	j.CoverSmallFile = coverSmallFile
