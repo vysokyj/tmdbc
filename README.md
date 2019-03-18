@@ -2,22 +2,27 @@
 
 [![Build Status](https://secure.travis-ci.org/vysokyj/tmdbc.svg?branch=master)](http://travis-ci.org/vysokyj/tmdbc)
 
-Command line utility for downloading metadata and posters from [The Movie Database](https://www.themoviedb.org) and inserting into movie files.
+Command line utility downloads metadata and posters from [The Movie Database](https://www.themoviedb.org) and inserts them into movie files.
 
-Supported video containsers: MKV
+## Main Features
 
-The tool searches in the database automaticaly by filename. The filename can contain the year in brackets.
-
-Supported movie name example: Alien (1979).mkv
+* Downloads metadata in predefined language (en, de, fr....)
+* Uses your own API key from [The Movie Database](https://www.themoviedb.org).
+* Supported video containers: MKV (for now)
 
 ## Compilation and Installation
 
-### Prerequsites
+### Prerequisites
 
-*  Install [mkvtoolnix](https://mkvtoolnix.download/)
-*  Install [GO](https://golang.org/)
+* Install [mkvtoolnix](https://mkvtoolnix.download/)
+* Install [GO](https://golang.org/)
+* Obtain your API key from [The Movie Database](https://www.themoviedb.org)
+* Support year in filaname - supported format example: `Alien (1979).mkv`
+
+Application will ask for the API key and prefered language when you start it for the first time. Configuration is keep in a `.tmdbc` file stored in your home directory.
 
 ### Commands
+
 
 ```bash
 go get -u github.com/disintegration/imaging
@@ -25,6 +30,14 @@ go get -u github.com/ryanbradynd05/go-tmdb
 go get -u github.com/vysokyj/tmdbc
 go install
 ```
+
+or
+
+```bash
+make
+```
+
+Make compiles all OS versions.
 
 ## Usage
 
