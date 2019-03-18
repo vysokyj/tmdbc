@@ -19,9 +19,9 @@ Command line utility downloads metadata and posters from [The Movie Database](ht
 * Obtain your API key from [The Movie Database](https://www.themoviedb.org)
 * Support year in filaname - supported format example: `Alien (1979).mkv`
 
-Application will ask for the API key and prefered language when you start it for the first time. Configuration is keep in a `.tmdbc` file stored in your home directory.
+Application will ask for the API key and preferred language when you start it for the first time. Configuration is kept in a `.tmdbc` file stored in your home directory.
 
-### Commands
+### Installation
 
 
 ```bash
@@ -31,13 +31,12 @@ go get -u github.com/vysokyj/tmdbc
 go install
 ```
 
-or
+or use make for cross compilation
 
 ```bash
 make
 ```
 
-Make compiles all OS versions.
 
 ## Usage
 
