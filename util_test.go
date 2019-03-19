@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -33,6 +34,15 @@ func TestFixSearchText3(t *testing.T) {
 	input := "SomeMovieName"
 	output := fixSearchText(input)
 	if output != "Some Movie Name" {
+		t.Fail()
+	}
+}
+
+func TestGetSafeText(t *testing.T) {
+	input := "  Pejsek & Kočička:   Vzkříšení/|\\*?   "
+	output := getSafeFileName(input)
+	fmt.Println(output)
+	if output != "Pejsek & Kočička - Vzkříšení" {
 		t.Fail()
 	}
 }

@@ -38,6 +38,13 @@ func newJob(file string) *job {
 	j := new(job)
 	j.File = file
 	j.CoverIds = make([]int, 0, 10)
+
+	p, err := filepath.Abs(j.File)
+	check(err)
+	if _, err := os.Stat(p); os.IsNotExist(err) {
+		fmt.Println("File \"" + p + "\" not found!")
+		os.Exit(1)
+	}
 	return j
 }
 
@@ -176,6 +183,24 @@ func (j *job) addNewMetadata() {
 	check(err)
 }
 
+func (j *job) getFilename() string {
+	var sb strings.Builder
+	sb.WriteString(getSafeFileName(j.Movie.Title))
+	sb.WriteString(" (")
+	sb.WriteString(getYear(j.Movie.ReleaseDate))
+	sb.WriteString(")")
+	sb.WriteString(j.Extension)
+	return sb.String()
+}
+
+func (j *job) renameFile() {
+	source, err := filepath.Abs(j.File)
+	check(err)
+	target := filepath.Join(filepath.Dir(source), j.getFilename())
+	check(os.Rename(source, target))
+	fmt.Println(source + " -> " + target)
+}
+
 func (j *job) processMovie() {
 	/*
 		fmt.Printf("Processing file: %s\n", j.File)
@@ -189,6 +214,7 @@ func (j *job) processMovie() {
 	j.prepareCovers()
 	j.loadOldMetadata()
 	j.addNewMetadata()
+	j.renameFile()
 }
 
 func (j *job) getMovie(movieShort *tmdb.MovieShort) {
@@ -262,7 +288,7 @@ func (j *job) searchMovie(name string, year string) {
 }
 
 
-// SearchByFilename search movie by filename
+// searchByFilename search movie by filename
 func (j *job) searchByFilename() {
 	j.Filename = filepath.Base(j.File)
 	j.Extension = filepath.Ext(j.Filename)
